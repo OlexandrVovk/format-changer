@@ -1,0 +1,15 @@
+
+version: "3"
+services:
+    app:
+      build: ./
+      container_name: "format-changer"
+      ports:
+        - 9091:9091
+      volumes:
+        - ./src/main/resources/static/documents:/app/src/main/resources/static/documents
+    gotenberg:
+      image: gotenberg/gotenberg:7
+      ports:
+        - 3000:3000
+
