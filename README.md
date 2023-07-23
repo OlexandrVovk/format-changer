@@ -16,7 +16,8 @@ To run the project, follow these steps:
 1. Clone the project repository from GitHub.
 2. Install Docker and Docker Compose on your system if you haven't already.
 3. Open a terminal/command prompt and navigate to the project repository folder.
-4. Execute the command `docker-compose up` to launch the project.
+4. Execute the command `docker-compose build` to build services.
+5. Execute the command `docker-compose up` to launch the project.
 
 After completing these steps, your web application will be accessible at the `http://localhost:9091`.
 In addition you can use Gotenberg API at the `http://localhost:3000`.   
