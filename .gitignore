@@ -7,7 +7,6 @@ target/maven-status
 target/surefire-reports
 target/test-classes
 !.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
 !**/src/test/**/target/
 
 ### STS ###
