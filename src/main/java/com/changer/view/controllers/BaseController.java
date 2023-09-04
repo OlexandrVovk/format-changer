@@ -1,8 +1,8 @@
 package com.changer.view.controllers;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -23,13 +23,26 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import java.io.*;
 import java.nio.file.*;
+import java.util.Arrays;
 
 
 @Controller
+@AllArgsConstructor
 public class BaseController {
+
     private final String UPLOAD_DIR_WORD = "/app/src/main/resources/static/documents/word/";
     private final String UPLOAD_DIR_PDF = "/app/src/main/resources/static/documents/pdf/";
     private final String CONVERT_URL = "http://gotenberg:3000/forms/libreoffice/convert";
+    private final String[] AVAILABLE_FORMATS = {".bib", ".doc",  ".xml", ".docx", ".fodt",
+            ".html",  ".ltx",  ".txt",  ".odt",  ".ott",  ".pdb",  ".pdf",  ".psw",  ".rtf",  ".sdw",
+            ".stw", ".sxw",  ".uot",  ".vor",  ".wps",  ".epub",  ".png",  ".bmp",  ".emf",  ".eps",
+            ".fodg",  ".gif",  ".jpg",  ".met",  ".odd",  ".otg",  ".pbm",  ".pct",  ".pgm",  ".ppm",
+            ".ras",  ".std",  ".svg",  ".svm",  ".swf",  ".sxd",  ".sxw",  ".tiff",  ".xhtml",  ".xpm",
+            ".fodp",  ".potm",  ".pot",  ".pptx",  ".pps",  ".ppt",  ".pwp",  ".sda",  ".sdd",  ".sti",
+            ".sxi",  ".uop",  ".wmf",  ".csv",  ".dbf",  ".dif",  ".fods",  ".ods",  ".ots",  ".pxl",
+            ".sdc",  ".slk",  ".stc",  ".sxc",  ".uos",  ".xls", ".xlt",  ".xlsx",  ".tif",  ".jpeg",
+            ".odp",  ".odg",  ".dotx", ".xltx"};
+
     @GetMapping("/")
     public String index(@ModelAttribute("message") String message,
                         @ModelAttribute("fileAdded") String fileAdded,
@@ -49,8 +62,15 @@ public class BaseController {
             return "redirect:/";
         }
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        if (!fileName.contains(".docx")){
-            redirectAttributes.addFlashAttribute("message", "Wrong file format, upload word file (.docx)");
+        boolean fineFileFormat = false;
+        for (String format : AVAILABLE_FORMATS) {
+            if (fileName.contains(format)) {
+                fineFileFormat = true;
+                break;
+            }
+        }
+        if (!fineFileFormat){
+            redirectAttributes.addFlashAttribute("message", "Wrong file format, upload Office documents (Word, Excel, PowerPoint, etc.)");
             return "redirect:/";
         }
         try {
