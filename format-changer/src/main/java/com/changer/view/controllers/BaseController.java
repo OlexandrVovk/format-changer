@@ -29,7 +29,7 @@ import java.nio.file.*;
 public class BaseController {
     private final String UPLOAD_DIR_WORD = "/app/src/main/resources/static/documents/word/";
     private final String UPLOAD_DIR_PDF = "/app/src/main/resources/static/documents/pdf/";
-    private final String CONVERT_URL = "http://gotenberg:3000/forms /libreoffice/convert";
+    private final String CONVERT_URL = "http://gotenberg:3000/forms/libreoffice/convert";
     @GetMapping("/")
     public String index(@ModelAttribute("message") String message,
                         @ModelAttribute("fileAdded") String fileAdded,
@@ -68,7 +68,7 @@ public class BaseController {
 
     @SneakyThrows
     @GetMapping("/convert")
-    public String convertDocument2(HttpServletRequest request, Model model){
+    public String convertDocument(HttpServletRequest request, Model model){
         Files.list(Paths.get(UPLOAD_DIR_PDF))
                 .forEach(file -> file.toFile().delete());
 
