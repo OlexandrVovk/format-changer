@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>download page</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin: 10px;
+        }
+
+        button a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        a {
+            text-decoration: none;
+            color: #333;
+        }
+
+        .email-form {
+            display: none; /* Форма початково прихована */
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .email-input {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            width: 250px;
+            font-size: 16px;
+        }
+
+        .send-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="button-container">
+    <button><a href="/get-file" th:download="${fileName}">Download</a></button>
+    <a href="/">Go to Homepage</a>
+    <button id="show-email-form">Send file to email</button> <!-- Додали ідентифікатор кнопці -->
+</div>
+
+<div class="email-form" id="email-form"> <!-- Додали ідентифікатор формі -->
+    <form action="/sendToEmail" method="GET">
+        <input class="email-input" type="email" name="email" placeholder="Enter your email" required>
+        <button class="send-button" type="submit">Send</button>
+    </form>
+</div>
+
+<script>
+    const showEmailFormButton = document.getElementById("show-email-form");
+    const emailForm = document.getElementById("email-form");
+
+    showEmailFormButton.addEventListener("click", () => {
+        emailForm.style.display = "flex"; // Показуємо форму при натисканні кнопки
+    });
+</script>
+</body>
+</html>

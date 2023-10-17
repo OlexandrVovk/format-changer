@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<head>
+    <title>format changer</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        section {
+            background-color: #f2f2f2;
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        #file-input-label {
+            margin-bottom: 10px;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        #file-input + label {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 3px;
+            display: inline-block;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4caf50;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+
+        p {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #convert-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #convert-button button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+
+        #convert-button button a {
+            text-decoration: none;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<section>
+    <div>
+        <div>
+            <div>
+                <h2>Format changer</h2>
+                <form th:method="@{POST}" th:action="@{/}" enctype="multipart/form-data">
+                    <div>
+                        <label id="file-input-label" for="file-input">Select a File</label>
+                        <input id="file-input" type="file" name="file">
+                    </div>
+                    <button type="submit">Upload File</button>
+                </form>
+                <p th:text="${message}"></p>
+                <div id="convert-button" th:if="${fileAdded}">
+                    <button><a href="/convert">convert</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

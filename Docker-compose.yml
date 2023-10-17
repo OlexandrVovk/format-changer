@@ -1,0 +1,29 @@
+version: "3"
+services:
+    app:
+      build:
+        context: ./format-changer
+        dockerfile: Dockerfile
+      container_name: "format-changer"
+      ports:
+        - 9091:9091
+      volumes:
+        - ./format-changer/src/main/resources/static/documents:/app/src/main/resources/static/documents
+    gotenberg:
+      image: gotenberg/gotenberg:7
+      ports:
+        - 3000:3000
+    rabbitmq:
+      image: rabbitmq:3.13-rc-management
+      ports:
+        - "5672:5672"
+        - "15672:15672"
+    email-service:
+      build:
+        context: EmailSenderService
+        dockerfile: Dockerfile
+      container_name: "EmailSenderService"
+      ports:
+        - 8080:8080
+      volumes:
+        - ./EmailSenderService/src/main/resources/static/documents/pdf:/email-sender-service/src/main/resources/static/documents/pdf
