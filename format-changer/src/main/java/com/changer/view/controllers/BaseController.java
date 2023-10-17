@@ -1,8 +1,10 @@
 package com.changer.view.controllers;
 
+import com.changer.view.services.FileConvertService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
@@ -27,10 +29,8 @@ import java.util.Arrays;
 
 
 @Controller
+@RequiredArgsConstructor
 public class BaseController {
-    private final String UPLOAD_DIR_WORD = "/app/src/main/resources/static/documents/word/";
-    private final String UPLOAD_DIR_PDF = "/app/src/main/resources/static/documents/pdf/";
-    private final String CONVERT_URL = "http://gotenberg:3000/forms/libreoffice/convert";
     private final String[] supportedFormats = {
             ".bib",".doc",".xml",".docx",".fodt",
             ".html.", "ltx",".txt",".odt",".ott",
@@ -48,6 +48,8 @@ public class BaseController {
             ".sxc",".uos",".xls",".xlt",".xlsx",".tif",
             ".jpeg",".odp",".odg",".dotx",".xltx"
     };
+
+    private final FileConvertService fileConvertService;
 
     @GetMapping("/")
     public String index(@ModelAttribute("message") String message,
@@ -76,14 +78,7 @@ public class BaseController {
             redirectAttributes.addFlashAttribute("message", "Wrong file format, upload LibreOffice file");
             return "redirect:/";
         }
-        try {
-            Path path = Paths.get(UPLOAD_DIR_WORD + fileName);
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-            HttpSession session = request.getSession();
-            session.setAttribute("fileName", fileName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        fileConvertService.saveFile(file, request);
         redirectAttributes.addFlashAttribute("message", "You successfully uploaded " + fileName + '!');
         redirectAttributes.addFlashAttribute("fileAdded", true);
         return "redirect:/";
@@ -92,51 +87,16 @@ public class BaseController {
     @SneakyThrows
     @GetMapping("/convert")
     public String convertDocument(HttpServletRequest request, Model model){
-        Files.list(Paths.get(UPLOAD_DIR_PDF))
-                .forEach(file -> file.toFile().delete());
-
-        String fileName = request.getSession().getAttribute("fileName").toString();
-        File inputFile = new File(UPLOAD_DIR_WORD + fileName);
-
-        try (CloseableHttpClient httpClient = HttpClients.createDefault();) {
-            HttpPost httpPost = new HttpPost(CONVERT_URL);
-            HttpEntity entity = MultipartEntityBuilder.create()
-                    .addBinaryBody("file", inputFile, ContentType.TEXT_HTML, inputFile.getName())
-                    .build();
-            httpPost.setEntity(entity);
-
-            try(CloseableHttpResponse response = httpClient.execute(httpPost)){
-                HttpEntity responseEntity = response.getEntity();
-                inputFile.delete();
-                if (responseEntity != null) {
-                    InputStream inputStream = responseEntity.getContent();
-                    fileName = fileName.replaceAll("\\.(.*)", ".pdf");
-                    String outputPath = UPLOAD_DIR_PDF + fileName;
-                    File outputFile = new File(outputPath);
-                    try (OutputStream outputStream = new FileOutputStream(outputFile)) {
-                        byte[] buffer = new byte[1024];
-                        int bytesRead;
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, bytesRead);
-                        }
-                    }
-                } else {
-                    System.err.println("Empty response entity.");
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        model.addAttribute("fileName", fileName);
-        request.getSession().setAttribute("fileName", fileName);
+        File convertedFile = fileConvertService.convertFile(request);
+        model.addAttribute("fileName", convertedFile.getName());
+        request.getSession().setAttribute("fileName", convertedFile.getName());
         return "download_page";
     }
 
     @SneakyThrows
-    @GetMapping("/get-file")
+    @GetMapping("/download")
     public void download(HttpServletResponse response, HttpServletRequest request) {
-        String fileName = request.getSession().getAttribute("fileName").toString();
-        InputStream inputStream = new FileInputStream(new File(UPLOAD_DIR_PDF + fileName));
+        InputStream inputStream = fileConvertService.downloadFile(request);
         IOUtils.copy(inputStream, response.getOutputStream());
         response.flushBuffer();
     }
