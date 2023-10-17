@@ -23,6 +23,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.core5.http.ContentType;
 import java.io.*;
 import java.nio.file.*;
+import java.util.Arrays;
 
 
 @Controller
@@ -30,6 +31,24 @@ public class BaseController {
     private final String UPLOAD_DIR_WORD = "/app/src/main/resources/static/documents/word/";
     private final String UPLOAD_DIR_PDF = "/app/src/main/resources/static/documents/pdf/";
     private final String CONVERT_URL = "http://gotenberg:3000/forms/libreoffice/convert";
+    private final String[] supportedFormats = {
+            ".bib",".doc",".xml",".docx",".fodt",
+            ".html.", "ltx",".txt",".odt",".ott",
+            ".pdb",".pdf",".psw",".rtf",".sdw",
+            ".stw",".sxw",".uot",".vor",".wps",
+            ".epub",".png",".bmp",".emf",".eps",
+            ".fodg",".gif",".jpg",".met",".odd",
+            ".otg",".pbm",".pct",".pgm",".ppm",
+            ".ras",".std",".svg",".svm",".swf",
+            ".sxd",".sxw",".tiff",".xhtml",".xpm",
+            ".fodp",".potm",".pot",".pptx",".pps",
+            ".ppt",".pwp",".sda",".sdd",".sti",".sxi",
+            ".uop", ".wmf", ".csv",".dbf",".dif",".fods",
+            ".ods",".ots", ".pxl", ".sdc", ".slk", ".stc",
+            ".sxc",".uos",".xls",".xlt",".xlsx",".tif",
+            ".jpeg",".odp",".odg",".dotx",".xltx"
+    };
+
     @GetMapping("/")
     public String index(@ModelAttribute("message") String message,
                         @ModelAttribute("fileAdded") String fileAdded,
@@ -49,8 +68,12 @@ public class BaseController {
             return "redirect:/";
         }
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        if (!fileName.contains(".docx")){
-            redirectAttributes.addFlashAttribute("message", "Wrong file format, upload word file (.docx)");
+        boolean wrongFileFormat = Arrays.stream(supportedFormats)
+                .filter(fileFormats -> fileName.contains(fileFormats))
+                .findFirst()
+                .isEmpty();
+        if (wrongFileFormat){
+            redirectAttributes.addFlashAttribute("message", "Wrong file format, upload LibreOffice file");
             return "redirect:/";
         }
         try {
